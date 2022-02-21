@@ -15,8 +15,7 @@ custom:
 provider:
   name: aws
   runtime: nodejs12.x
-
-  stage: dev
+  stage: production
   region: ap-northeast-2
 
 functions:
