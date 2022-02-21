@@ -34,26 +34,12 @@ module.exports = async (event) => {
 
   const inputPdfPath = '/tmp/input.pdf';
   const stampPdfPath = '/tmp/stamp.pdf';
-  try {
-    await Promise.all([
-      fs.writeFile(inputPdfPath, inputFile.content),
-      fs.writeFile(stampPdfPath, stampFile.content)
-    ]);
-  } catch (e) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify(
-        {
-          message: 'Failed to save PDF',
-          input: event,
-        },
-        null,
-        2
-      ),
-    };
-  }
+  await Promise.all([
+    fs.writeFile(inputPdfPath, inputFile.content),
+    fs.writeFile(stampPdfPath, stampFile.content)
+  ]);
 
-  let buffer;
+  let isSinglePage = false;
   try {
     // split pages into first page and rest pages
     await Promise.all([
@@ -66,18 +52,46 @@ module.exports = async (event) => {
         .cat('2-end')
         .output('/tmp/rest_pages.pdf')
     ]);
+  } catch (e) {
+    if (e.includes('Range start page number exceeds size of PDF')) {
+      isSinglePage = true;
+    } else {
+      console.error(e);
+      return {
+        statusCode: 500,
+        body: JSON.stringify(
+          {
+            message: 'Failed to split PDF',
+            input: event,
+          },
+          null,
+          2
+        ),
+      };
+    }
+  }
 
-    // stamp first page
-    await pdftk
-      .input('/tmp/first_page.pdf')
-      .stamp(stampPdfPath)
-      .output('/tmp/first_page_with_stamp.pdf');
+  let buffer;
+  try {
+    if (isSinglePage) {
+      // stamp original pdf
+      buffer = await pdftk
+        .input(inputPdfPath)
+        .stamp(stampPdfPath)
+        .output();
+    } else {
+      // stamp first page
+      await pdftk
+        .input('/tmp/first_page.pdf')
+        .stamp(stampPdfPath)
+        .output('/tmp/first_page_with_stamp.pdf');
 
-    // merge stamp first page and rest pages
-    buffer = await pdftk
-      .input(['/tmp/first_page_with_stamp.pdf', '/tmp/rest_pages.pdf'])
-      .cat()
-      .output();
+      // merge stamp first page and rest pages
+      buffer = await pdftk
+        .input(['/tmp/first_page_with_stamp.pdf', '/tmp/rest_pages.pdf'])
+        .cat()
+        .output();
+    }
   } catch (e) {
     console.error('pdftk error', e);
     return {
