@@ -109,13 +109,10 @@ module.exports = async (event) => {
 
   return {
     statusCode: 200,
-    body: JSON.stringify(
-      {
-        message: 'Success',
-        base64: buffer.toString('base64'),
-      },
-      null,
-      2
-    ),
+    headers: {
+      "Content-Type": "application/pdf",
+    },
+    body: buffer.toString('base64'),
+    isBase64Encoded: true,
   };
 };
