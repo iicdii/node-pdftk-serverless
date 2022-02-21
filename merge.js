@@ -5,6 +5,12 @@ const parser = require('lambda-multipart-parser');
 const fs = require('fs').promises;
 
 module.exports = async (event) => {
+  // Fix busboy issue - https://github.com/mscdex/busboy/issues/210
+  Object.keys(event.headers).forEach((key) => {
+    const value = event.headers[key];
+    delete event.headers[key];
+    event.headers[key.toLowerCase()] = value;
+  }, {});
   const { files } = await parser.parse(event);
 
   const inputPdfPaths = [];
@@ -28,10 +34,10 @@ module.exports = async (event) => {
   } catch (e) {
     console.error('pdftk error', e);
     return {
-      statusCode: 200,
+      statusCode: 500,
       body: JSON.stringify(
         {
-          message: 'Failed to handle PDF',
+          message: 'Failed to merge PDF',
           input: event,
         },
         null,
