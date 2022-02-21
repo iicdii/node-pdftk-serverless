@@ -1,0 +1,39 @@
+service: node-pdftk-serverless
+# app and org for use with dashboard.serverless.com
+#app: your-app-name
+#org: your-org-name
+
+frameworkVersion: '3'
+
+plugins:
+  - serverless-offline
+
+custom:
+  serverless-offline:
+    useDocker: true
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+
+  stage: dev
+  region: ap-northeast-2
+
+functions:
+  stamp:
+    handler: app.stamp
+    events:
+      - httpApi:
+          path: /stamp
+          method: post
+    layers:
+      - arn:aws:lambda:ap-northeast-2:545918303703:layer:pdftkLayer:3
+
+  merge:
+    handler: app.merge
+    events:
+      - httpApi:
+          path: /merge
+          method: post
+    layers:
+      - arn:aws:lambda:ap-northeast-2:545918303703:layer:pdftkLayer:3
