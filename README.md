@@ -33,7 +33,7 @@ Note that you should use `input`, `stamp` for key name.
 
 It stamps `stamp` PDF on `input` PDF, but only first page. You can change the function in `stamp.js`.
 
-It returns PDF blob with `application/pdf` header so that you can check out the preview in response body in Postman.
+It returns PDF blob with `application/pdf` header so you can check out the preview in response body in Postman.
 
 ### Send POST to `http://localhost:3000/merge` to test `merge` PDF
 <p>
@@ -43,7 +43,7 @@ It returns PDF blob with `application/pdf` header so that you can check out the 
 
 It merges all incoming PDF regardless of key name.
 
-It returns PDF blob with `application/pdf` header so that you can check out the preview in response body in Postman.
+It returns PDF blob with `application/pdf` header so you can check out the preview in response body in Postman.
 
 ## Deployment
 ### Configure `serverless.yml`
