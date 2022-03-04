@@ -41,7 +41,7 @@ It returns PDF blob with `application/pdf` header so you can check out the previ
   <em>Postman body example</em>
 </p>
 
-It merges all incoming PDF regardless of key name.
+It merges all incoming PDF regardless of key name. Note that the page order is output as a result of sorting the keys in the file in ascending order.
 
 It returns PDF blob with `application/pdf` header so you can check out the preview in response body in Postman.
 

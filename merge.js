@@ -11,7 +11,10 @@ module.exports = async (event) => {
     delete event.headers[key];
     event.headers[key.toLowerCase()] = value;
   }, {});
-  const { files } = await parser.parse(event);
+  const multipartForm = await parser.parse(event);
+  const files = multipartForm.files.sort((a, b) =>
+    a.fieldname.localeCompare(b.fieldname)
+  );
 
   const inputPdfPaths = [];
   const writePromises = [];
